@@ -1,0 +1,35 @@
+#! /bin/bash
+
+re='^[0-9]+$'
+input=$1
+
+if [[ $input == '-h' ]]
+then
+   echo $'\nUSAGE:\nUse this handy-dandy script to view a set of git branches in your current repo, filtered either by the "n" most recent branches or by grepping for a keyword, with restriction terms passed as a variable.\n\nHappy Gittin!\n'
+   exit
+fi
+
+if [[ $input == '' ]]
+then
+  input=5
+fi
+
+if [[ $input =~ $re ]]
+then
+   git branch --sort=-committerdate | head -n $input | nl
+else
+   git branch | grep $input | sort | nl
+fi
+
+echo "Which branch? "
+
+read branchNum
+
+if [[ $input =~ $re ]]
+then
+   branchName=$(git branch --sort=-committerdate | sed -n "$branchNum"p | tr -d [[:space:]])
+else
+   branchName=$(git branch | grep $input | sort | sed -n "$branchNum"p | tr -d [[:space:]])
+fi
+
+git checkout $branchName
